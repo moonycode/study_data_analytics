@@ -34,7 +34,7 @@ Dataset from : https://blog.naver.com/data_station/222493245799
 | type_of_contract | | 렌탈, 멤버십 |  범주형-명목형 :  |
 | type_of_contract2 | | Normal, Extension_Rental, TAS, ... |  범주형-명목형 :  |
 | channel | | 서비스 방문, 홈쇼핑/방송, 렌탈재계약, ... |  범주형-명목형 |
-| datetime | | 2019-10-20, 2019-11-25, 2020-01-06 |  수치형-이산형 or 범주형-순서형? |
+| datetime | | 2019-10-20, 2019-11-25, 2020-01-06 |  수치형-이산형 or 범주형-순서형 : 날짜는 경우에 따라 타입을 다양하게 판단할 수 있음. |
 | Term | | 60, 36, 12, 39 |  수치형-이산형 :  유의미한 수치데이터임. |
 | payment_type | | CMS, 카드이체, 무통장, ... |  범주형-명목형 |
 | product | | K1, K2, ... |  범주형-명목형 :  제품모델을 구분하기 위한 id임. |
