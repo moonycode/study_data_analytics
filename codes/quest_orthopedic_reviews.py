@@ -96,24 +96,29 @@ df_hospital = pd.DataFrame(hospital_data, columns=["hospital", "url"])
 
 # 한 병원 url이 한 사이클
 for url in df_hospital['url']:
+    # List생성, Column명 지정
+    reviews_list = []
+    columns_name = ['hospital', 'address', 'name', 'content', 'date', 'visits']
+    
     # 네이버플레이스 사이트 접속
     browser.get(url)
-    browser.implicitly_wait(5)
+    browser.implicitly_wait(3)
     hospital = browser.find_element_by_css_selector('#_title > span.Fc1rA').text # 병원명
     address = browser.find_element_by_css_selector('div > div > a > span.LDgIH').text # 주소
-    print("■", hospital, "-",address) # 병원명, 주소 출력
+    print("■", hospital, address) # 병원명, 주소 출력
     
     # 리뷰탭 클릭
     browser.find_element_by_css_selector('div.place_fixed_maintab > div > div > div > div > a:nth-child(2) > span').click()
-    time.sleep(2)
+    time.sleep(1)
     # 전체 더보기 버튼 클릭
     while True:
         try:
             browser.find_element_by_css_selector('div > div > div > div.lfH3O > a').click()
+            time.sleep(1)
         except:
             break
-    browser.find_element_by_css_selector('body').send_keys(Keys.HOME) # 화면 상단으로 이동
-    time.sleep(3)
+
+    time.sleep(1)
 
 #    # 리뷰 더보기 버튼 개수 찾기 (화면 크기에 따라 달라짐)
 #    see_more_buttons = browser.find_elements_by_css_selector('div.place_section_content > ul > li > div > a > span.rvCSr')
@@ -124,23 +129,29 @@ for url in df_hospital['url']:
 #        see_more_path = see_more_buttons[num_see_more]
 #        see_more_path.click()
         
-    
-    # List생성, Column명 지정
-    reviews_list = []
-    columns_name = ['hospital', 'address', 'name', 'content', 'date', 'visits']
+    # reviews_bundle : 전체 리뷰 (리뷰박스) 가져오기
+    reviews_bundle = browser.find_elements_by_css_selector('div:nth-child(7) > div:nth-child(3) > div > div > ul > li')
 
+    browser.find_element_by_css_selector('body').send_keys(Keys.HOME)
+
+    for click_review, review in enumerate(reviews_bundle):
+        try:
+            click_review_path = browser.find_element_by_css_selector('div > ul > li:nth-child({}) > div.ZZ4OK > a > span'.format(click_review+1))
+            click_review_path.click()
+        except:
+            try:
+                time.sleep(1)
+                click_review_path.click()
+            except:
+                print("실패")
+                pass
+    # 클릭한 리뷰로 다시 저장
     reviews_bundle = browser.find_elements_by_css_selector('div:nth-child(7) > div:nth-child(3) > div > div > ul > li')
     
-    reviews_bundle.find_element_by_css_selector('li:nth-child({}) > div.ZZ4OK > a'.format(index)).click()
-
-
-    pass
-
     # 리뷰박스에서 작성자명, 리뷰내용, 날짜, 방문횟수 수집 # 리스트에 추가
     cnt = 0 # 리뷰 저장 개수 카운트
-    for index, review in enumerate(reviews_bundle, start=1):
+    for review in reviews_bundle:
         try :
-
             content = review.find_element_by_css_selector('div.place_section_content > ul > li > div.ZZ4OK > a').text
             name = review.find_element_by_css_selector('div > ul > li > div > a > div.VYGLG').text 
             date = review.find_element_by_css_selector('li > div > div > div > span:nth-child(1) > span:nth-child(3)').text
@@ -157,16 +168,10 @@ for url in df_hospital['url']:
     collection.insert_many(data_dict)        
     
     print("전체 댓글  :", len(reviews_bundle))
-    print("저장된 댓글 :", cnt)     
+    print("저장된 댓글 :", cnt)  
+    print("DB 업로드 댓글 :", len(reviews_list))      
 
-print("DB 업로드 댓글 :", len(reviews_list))     
+  
+
+
 browser.quit()
-
-
-# In[ ]:
-
-
-# {"content": {"$regex": "수술"}}
-# {"hospital": {"$regex": "연세백퍼센트병원"}}
-# {"name": {"$regex": "동동"}}
-
